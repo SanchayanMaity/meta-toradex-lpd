@@ -1,4 +1,4 @@
-From 9e0f4944553ce83c9a3beda0023c1cccceb7e1b4 Mon Sep 17 00:00:00 2001
+From 90595daa5cab2d154f0b4dd7ab5b8c8a466752ec Mon Sep 17 00:00:00 2001
 From: Stefan Agner <stefan.agner@toradex.com>
 Date: Thu, 16 Feb 2017 17:06:24 -0800
 Subject: [PATCH] ARM: dts: imx7-colibri: introduce low power carrier board
@@ -13,10 +13,10 @@ Additionally, the board uses the ublox EMMY-W1 (W165) WiFi solution.
 Signed-off-by: Stefan Agner <stefan.agner@toradex.com>
 ---
  arch/arm/boot/dts/Makefile              |   2 +
- arch/arm/boot/dts/imx7-colibri-lpd.dtsi | 281 ++++++++++++++++++++++++++++++++
+ arch/arm/boot/dts/imx7-colibri-lpd.dtsi | 321 ++++++++++++++++++++++++++++++++
  arch/arm/boot/dts/imx7d-colibri-lpd.dts |  23 +++
  arch/arm/boot/dts/imx7s-colibri-lpd.dts |  18 ++
- 4 files changed, 324 insertions(+)
+ 4 files changed, 364 insertions(+)
  create mode 100644 arch/arm/boot/dts/imx7-colibri-lpd.dtsi
  create mode 100644 arch/arm/boot/dts/imx7d-colibri-lpd.dts
  create mode 100644 arch/arm/boot/dts/imx7s-colibri-lpd.dts
@@ -36,12 +36,12 @@ index 6ad084d47853..4945438498aa 100644
  	imx7d-sdb-gpmi-weim.dtb \
 diff --git a/arch/arm/boot/dts/imx7-colibri-lpd.dtsi b/arch/arm/boot/dts/imx7-colibri-lpd.dtsi
 new file mode 100644
-index 000000000000..578b1e24d1da
+index 000000000000..b9bd8be771e6
 --- /dev/null
 +++ b/arch/arm/boot/dts/imx7-colibri-lpd.dtsi
-@@ -0,0 +1,281 @@
+@@ -0,0 +1,321 @@
 +/*
-+ * Copyright 2016 Toradex AG
++ * Copyright 2017 Toradex AG
 + *
 + * This program is free software; you can redistribute it and/or modify
 + * it under the terms of the GNU General Public License as published by
@@ -53,21 +53,21 @@ index 000000000000..578b1e24d1da
 +	chosen {
 +		bootargs = "console=ttymxc0,115200";
 +	};
-+/*
++
 +	gpio-keys {
 +		compatible = "gpio-keys";
 +		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_gpiokeys>;
++		pinctrl-0 = <&pinctrl_pciewakeup>;
 +
 +		power {
-+			label = "Wake-Up";
-+			gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
++			label = "PCIe Wake-Up";
++			gpios = <&gpio3 25 GPIO_ACTIVE_HIGH>;
 +			linux,code = <KEY_WAKEUP>;
 +			debounce-interval = <10>;
 +			gpio-key,wakeup;
 +		};
 +	};
-+*/
++
 +	extcon_usbc_det: usbc_det {
 +		compatible = "linux,extcon-usb-gpio";
 +		debounce = <25>;
@@ -76,43 +76,51 @@ index 000000000000..578b1e24d1da
 +		pinctrl-0 = <&pinctrl_usbc_det>;
 +	};
 +
-+	reg_33v: regulator-33v {
-+		pinctrl-0 = <&pinctrl_en_33v>;
++	reg_3v3_a7: regulator-3v3-a7 {
 +		compatible = "regulator-fixed";
-+		regulator-name = "3.3V";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_en_33v_a7>;
++		regulator-name = "3.3V_A7";
 +		regulator-min-microvolt = <3300000>;
 +		regulator-max-microvolt = <3300000>;
++		/* We can not specify all consumer, go safe and leave it on */
++		regulator-always-on;
 +		gpio = <&gpio2 10 GPIO_ACTIVE_HIGH>;
-+
-+		regulator-state-mem {
-+			regulator-off-in-suspend;
-+		};
++		enable-active-high;
 +	};
 +
-+	reg_wifi: regulator-wifi {
-+		pinctrl-0 = <&pinctrl_en_33v_wifi>;
++	reg_3v3_wifi: regulator-3v3-wifi {
 +		compatible = "regulator-fixed";
-+		regulator-name = "3.3V WiFi";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_en_33v_wifi>;
++		regulator-name = "3.3V_WiFi";
 +		regulator-min-microvolt = <3300000>;
 +		regulator-max-microvolt = <3300000>;
 +		gpio = <&gpio2 25 GPIO_ACTIVE_HIGH>;
-+
-+		regulator-state-mem {
-+			regulator-off-in-suspend;
-+		};
++		enable-active-high;
 +	};
 +
-+	reg_5v: regulator-5v {
-+		pinctrl-0 = <&pinctrl_en_5v_a7>;
++	reg_5v0: regulator-5v0 {
 +		compatible = "regulator-fixed";
-+		regulator-name = "5V";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_en_5v_a7>;
++		regulator-name = "5V_A7";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
 +		gpio = <&gpio5 2 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
 +
-+		regulator-state-mem {
-+			regulator-on-in-suspend;
-+		};
++	reg_usbh_vbus: regulator-usbh-vbus {
++		compatible = "regulator-fixed";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_usbh1_reg>;
++		regulator-name = "VCC_USB[1-4]";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		/* Not usable since GPIO4 is used by M4! */
++		/*gpio = <&gpio4 7 GPIO_ACTIVE_LOW>;*/
++		vin-supply = <&reg_5v0>;
 +	};
 +};
 +
@@ -242,19 +250,19 @@ index 000000000000..578b1e24d1da
 +};
 +
 +&pwm2 {
-+	status = "okay";
++	status = "disabled";
 +};
 +
 +&pwm3 {
-+	status = "okay";
++	status = "disabled";
 +};
 +
 +&pwm4 {
-+	status = "okay";
++	status = "disabled";
 +};
 +
 +&uart1 {
-+	pinctrl-0 = <&pinctrl_uart1 &pinctrl_uart1_ctrl1>;
++	pinctrl-0 = <&pinctrl_uart1>;
 +	status = "okay";
 +};
 +
@@ -269,17 +277,14 @@ index 000000000000..578b1e24d1da
 +
 +&usbotg1 {
 +	extcon = <&extcon_usbc_det>;
-+	vbus-supply = <&reg_usb_otg2_vbus>;
++	vbus-supply = <&reg_usbh_vbus>;
 +	status = "okay";
 +};
 +
 +&usdhc1 {
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_usdhc1 &pinctrl_cd_usdhc1>;
-+	vmmc-supply = <&reg_wifi>;
++	vmmc-supply = <&reg_3v3_wifi>;
 +	no-1-8-v;
 +	disable-wp;
 +	non-removable;
@@ -289,13 +294,23 @@ index 000000000000..578b1e24d1da
 +	status = "okay";
 +};
 +
++&usdhc2 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usdhc2 &pinctrl_cd_usdhc2>;
++	vmmc-supply = <&reg_3v3_a7>;
++	no-1-8-v;
++	disable-wp;
++	/*keep-power-in-suspend;*/
++
++	status = "okay";
++};
 +
 +&iomuxc {
 +	pinctrl-names = "";
 +	pinctrl-0 = <>;
 +
 +	imx7d-colibri {
-+		pinctrl_en_33v: en33vgpio {
++		pinctrl_en_33v_a7: en33vgpio {
 +			fsl,pins = <
 +				MX7D_PAD_EPDC_DATA10__GPIO2_IO10	0x74 /* SODIMM 105 */
 +			>;
@@ -319,11 +334,36 @@ index 000000000000..578b1e24d1da
 +				MX7D_PAD_LCD_DATA18__GPIO3_IO23		0x14 /* SODIMM 136 */
 +			>;
 +		};
++
++		pinctrl_pciewakeup: pciewakeup {
++			fsl,pins = <
++				MX7D_PAD_LCD_DATA20__GPIO3_IO25		0x14 /* SODIMM 140 */
++			>;
++		};
++
++		pinctrl_usdhc2: usdhc2grp {
++			fsl,pins = <
++				MX7D_PAD_SD2_CMD__SD2_CMD	0x59 /* SODIMM 186 */
++				MX7D_PAD_SD2_CLK__SD2_CLK	0x19 /* SODIMM 184 */
++
++				MX7D_PAD_SD2_DATA0__SD2_DATA0	0x59 /* SODIMM 23 */
++				MX7D_PAD_SD2_DATA1__SD2_DATA1	0x59 /* SODIMM 31 */
++				MX7D_PAD_SD2_DATA2__SD2_DATA2	0x59 /* SODIMM 100 */
++				MX7D_PAD_SD2_DATA3__SD2_DATA3	0x59 /* SODIMM 102 */
++			>;
++		};
++
++		pinctrl_cd_usdhc2: usdhc2-cd-grp {
++			fsl,pins = <
++				MX7D_PAD_LCD_DATA19__GPIO3_IO24	0x59 /* SODIMM 138 */
++			>;
++		};
++
 +	};
 +};
 diff --git a/arch/arm/boot/dts/imx7d-colibri-lpd.dts b/arch/arm/boot/dts/imx7d-colibri-lpd.dts
 new file mode 100644
-index 000000000000..117540778ff4
+index 000000000000..18d9c3eee1a7
 --- /dev/null
 +++ b/arch/arm/boot/dts/imx7d-colibri-lpd.dts
 @@ -0,0 +1,23 @@
@@ -347,7 +387,7 @@ index 000000000000..117540778ff4
 +};
 +
 +&usbotg2 {
-+	vbus-supply = <&reg_usb_otg2_vbus>;
++	vbus-supply = <&reg_usbh_vbus>;
 +	status = "okay";
 +};
 diff --git a/arch/arm/boot/dts/imx7s-colibri-lpd.dts b/arch/arm/boot/dts/imx7s-colibri-lpd.dts
@@ -375,5 +415,5 @@ index 000000000000..e0ffd5edef66
 +		     "fsl,imx7s", "fsl,imx7d";
 +};
 -- 
-2.11.0
+2.12.0
 
