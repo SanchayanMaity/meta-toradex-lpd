@@ -72,8 +72,8 @@ GSTREAMER_append_mx7 = " \
 IMAGE_INSTALL_QT5 = " \
     packagegroup-qt5 \
     liberation-fonts \
-    qtsmarthome \
-    qt5-x11-free-systemd \
+    colibri-imx7-low-power-demo \
+    qt5-x11-free-lpd-systemd \
 "
 
 IMAGE_INSTALL_append_mx6 = " \
