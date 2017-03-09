@@ -1,4 +1,4 @@
-From 90595daa5cab2d154f0b4dd7ab5b8c8a466752ec Mon Sep 17 00:00:00 2001
+From 0e8144e8d4ed3e85245f39790b61b6059c0c2409 Mon Sep 17 00:00:00 2001
 From: Stefan Agner <stefan.agner@toradex.com>
 Date: Thu, 16 Feb 2017 17:06:24 -0800
 Subject: [PATCH] ARM: dts: imx7-colibri: introduce low power carrier board
@@ -13,10 +13,10 @@ Additionally, the board uses the ublox EMMY-W1 (W165) WiFi solution.
 Signed-off-by: Stefan Agner <stefan.agner@toradex.com>
 ---
  arch/arm/boot/dts/Makefile              |   2 +
- arch/arm/boot/dts/imx7-colibri-lpd.dtsi | 321 ++++++++++++++++++++++++++++++++
+ arch/arm/boot/dts/imx7-colibri-lpd.dtsi | 285 ++++++++++++++++++++++++++++++++
  arch/arm/boot/dts/imx7d-colibri-lpd.dts |  23 +++
  arch/arm/boot/dts/imx7s-colibri-lpd.dts |  18 ++
- 4 files changed, 364 insertions(+)
+ 4 files changed, 328 insertions(+)
  create mode 100644 arch/arm/boot/dts/imx7-colibri-lpd.dtsi
  create mode 100644 arch/arm/boot/dts/imx7d-colibri-lpd.dts
  create mode 100644 arch/arm/boot/dts/imx7s-colibri-lpd.dts
@@ -36,10 +36,10 @@ index 6ad084d47853..4945438498aa 100644
  	imx7d-sdb-gpmi-weim.dtb \
 diff --git a/arch/arm/boot/dts/imx7-colibri-lpd.dtsi b/arch/arm/boot/dts/imx7-colibri-lpd.dtsi
 new file mode 100644
-index 000000000000..b9bd8be771e6
+index 000000000000..9518ac87c988
 --- /dev/null
 +++ b/arch/arm/boot/dts/imx7-colibri-lpd.dtsi
-@@ -0,0 +1,321 @@
+@@ -0,0 +1,285 @@
 +/*
 + * Copyright 2017 Toradex AG
 + *
@@ -187,58 +187,22 @@ index 000000000000..b9bd8be771e6
 +		bus-width = <18>;
 +
 +		display-timings {
-+			native-mode = <&timing_vga>;
++			native-mode = <&timing_wvga>;
 +
-+			/* Standard VGA timing */
-+			timing_vga: 640x480 {
-+				clock-frequency = <25175000>;
-+				hactive = <640>;
-+				vactive = <480>;
-+				hback-porch = <40>;
-+				hfront-porch = <24>;
-+				vback-porch = <32>;
-+				vfront-porch = <11>;
-+				hsync-len = <96>;
-+				vsync-len = <2>;
-+
-+				de-active = <1>;
-+				hsync-active = <0>;
-+				vsync-active = <0>;
-+				pixelclk-active = <0>;
-+			};
-+
-+			/* WVGA Timing, e.g. EDT ET070080DH6 */
++			/* WVGA Timing for LPD */
 +			timing_wvga: 800x480 {
 +				clock-frequency = <33260000>;
 +				hactive = <800>;
 +				vactive = <480>;
-+				hback-porch = <216>;
-+				hfront-porch = <40>;
-+				vback-porch = <35>;
++				hback-porch = <40>;
++				hfront-porch = <88>;
++				vback-porch = <33>;
 +				vfront-porch = <10>;
-+				hsync-len = <128>;
++				hsync-len = <154>;
 +				vsync-len = <2>;
-+
 +				de-active = <1>;
 +				hsync-active = <0>;
-+				vsync-active = <0>;
-+				pixelclk-active = <0>;
-+			};
-+			/* WVGA Timing, TouchRevolution Fusion 7" */
-+			timing_wvga2: 800x480pixclkact {
-+				clock-frequency = <33260000>;
-+				hactive = <800>;
-+				vactive = <480>;
-+				hback-porch = <216>;
-+				hfront-porch = <40>;
-+				vback-porch = <35>;
-+				vfront-porch = <10>;
-+				hsync-len = <128>;
-+				vsync-len = <2>;
-+
-+				de-active = <1>;
-+				hsync-active = <0>;
-+				vsync-active = <0>;
++				vsync-active = <1>;
 +				pixelclk-active = <1>;
 +			};
 +		};
