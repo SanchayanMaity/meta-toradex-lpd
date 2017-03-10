@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "qtcharts qtserialport"
 
-SRCREV = "82f6ed0f7abf43e8a1ee018f0d736c49afe34684"
+SRCREV = "60cb0c801b15b4e9ee37cd63e36ff22de015cbbd"
 SRC_URI = "git://github.com/SanchayanMaity/EmbeddedWorldLowPowerDemo.git;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
